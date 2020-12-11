@@ -1,4 +1,4 @@
-package com.cognizant.TikTak;
+package com.cognizant;
 
 import java.util.Date;
 import java.util.List;
@@ -26,7 +26,7 @@ public class Game {
 	}
 
 	public Game(String id, String username1, String username2, Date createdTime,
-			Date updatedTime, List<com.cognizant.TicTac.GameMove> gameMoves) {
+			Date updatedTime, List<com.cognizant.GameMove> gameMoves) {
 		this();
 		this.id = id;
 		this.username1 = username1;

@@ -1,4 +1,4 @@
-package com.cognizant.TikTak;
+package com.cognizant;
 
 import java.util.Date;
 
