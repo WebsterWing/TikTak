@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak Project
+
+Parameters:
+  HashKeyElementName:
+    Type: String
+    Default: EmployeeId
+    Description: Hash Key Name
+  HashKeyElementType:
+    Type: String
+    Default: S
+    Description: Hash Key Type
+
+  ReadCapacityUnits:
+    Type: Number
+    Default: 5
+    Description: Read Capacity Units
+  WriteCapacityUnits:
+    Type: Number
+    Default: 5
+    Description: Write Capacity Units
+
+Resources:
+  TikTakTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TikTakTable
+      AttributeDefinitions:
+        # Primary and Sort Keys
+        -
+          AttributeName: PK
+          AttributeType: S
+        -
+          AttributeName: SK
+          AttributeType: S
+
+        -
+          AttributeName: GS1PK
+          AttributeType: S
+        -
+          AttributeName: GS1SK
+          AttributeType: S
+
+      KeySchema:
+        -
+          AttributeName: PK
+          KeyType: HASH
+        -
+          AttributeName: SK
+          KeyType: RANGE
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnits
+        WriteCapacityUnits: !Ref WriteCapacityUnits
+
+      GlobalSecondaryIndexes:
+        -
+          IndexName: TikTakGSI1
+
+          KeySchema:
+            # Primary and Sort Keys
+            -
+              AttributeName: GS1PK
+              KeyType: HASH
+            -
+              AttributeName: GS1SK
+              KeyType: RANGE
+
+          Projection:
+            ProjectionType: KEYS_ONLY
+
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref ReadCapacityUnits
+            WriteCapacityUnits: !Ref WriteCapacityUnits
+
+      Tags:
+        -
+          Key: Name
+          Value: TikTakDynamoDB
+
+            #   TikTakDBPolicy:
+            #     Type: AWS::IAM::Role
+            #     Properties:
+            #       Description: IAM role for read and write from dynamodb database
+            #       Policies:
+
+
+
+Outputs:
+  TikTakTable:
+    Description: Table Created using this template.
+    Value: !Ref TikTakTable
