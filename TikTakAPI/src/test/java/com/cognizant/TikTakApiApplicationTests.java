@@ -18,10 +18,15 @@ class TikTakApiApplicationTests {
 
 	@Test
 	public void sampleTestCase() {
-		Game g = new Game("id", "username1", "usernhme2", new Date(),
-		new Date(), new ArrayList<GameMove>());
+		Game g = new Game();
+		g.setUsername1("test1");
+		g.setUsername2("test2");
+		g.setCreatedTime(new Date());
+		g.setCreatedTime(new Date());
 		
 		repository.save(g);
+		
+		assert(!g.getId().equals("GAME#null"));
 	}
 
 	@Test
