@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 @DynamoDBTable(tableName="TikTakTable")
-public class User {
+public class User implements IdPrefixInterface {
 	private String username;
 	private String passwordHash;
 
@@ -17,9 +17,13 @@ public class User {
 		this.passwordHash = passwordHash;
 	}
 
+	public String getIdPrefix() {
+        return "USER#";
+	}
+
 	@DynamoDBHashKey(attributeName = "PK")
 	public String getId() {
-		return "USER#" + username;
+		return getIdPrefix() + username;
 	}
 	// public void setId(String username) {
 	// 	this.username = username;
