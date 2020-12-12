@@ -45,7 +45,7 @@ public class Game {
 		this.id = id;
 	}
 
-	@DynamoDBHashKey(attributeName = "FK")
+	@DynamoDBHashKey(attributeName = "SK")
 	public String getMetadata() {
 		return "METADATA#" + id;
 	}
