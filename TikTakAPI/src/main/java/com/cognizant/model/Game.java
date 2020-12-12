@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.model;
 
 import java.util.Date;
 import java.util.List;
@@ -25,7 +25,7 @@ public class Game {
 	public Game() {}
 
 	public Game(String username1, String username2, Date createdTime,
-			Date updatedTime, List<com.cognizant.GameMove> gameMoves) {
+			Date updatedTime, List<GameMove> gameMoves) {
 		this();
 		// this.id = id;
 		this.username1 = username1;

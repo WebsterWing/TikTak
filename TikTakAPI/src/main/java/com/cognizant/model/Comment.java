@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.model;
 
 import java.util.Date;
 

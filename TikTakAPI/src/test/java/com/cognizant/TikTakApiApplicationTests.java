@@ -1,5 +1,8 @@
 package com.cognizant;
 
+import com.cognizant.repo.GameRepository;
+import com.cognizant.model.Game;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

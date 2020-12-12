@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.config;
 
 import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRepositories;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 
 @Configuration
 @ConfigurationProperties("amazon.aws")
-@EnableDynamoDBRepositories(basePackages = "com.cognizant")
+@EnableDynamoDBRepositories(basePackages = "com.cognizant.repo")
 public class DynamoDBConfig {
 
 	@Value("${amazon.aws.accesskey}")

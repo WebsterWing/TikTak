@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;

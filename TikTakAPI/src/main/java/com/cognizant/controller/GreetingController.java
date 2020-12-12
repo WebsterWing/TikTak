@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.controller;
 
 import java.util.concurrent.atomic.AtomicLong;
 
