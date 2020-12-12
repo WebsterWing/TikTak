@@ -15,8 +15,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 
 @Configuration
-@EnableDynamoDBRepositories(basePackageClasses = GameRepository.class)
-public final class DynamoDBConfig {
+@EnableDynamoDBRepositories(basePackages = "com.cognizant")
+public class DynamoDBConfig {
 
 	@Value("${amazon.aws.accesskey}")
 	private String amazonAWSAccessKey;
@@ -46,6 +46,6 @@ public final class DynamoDBConfig {
 	@Bean
 	public AmazonDynamoDB amazonDynamoDB() {
 		return AmazonDynamoDBClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
-				.withRegion(Regions.US_EAST_1).build();
+				.withRegion(Regions.US_EAST_2).build();
 	}
 }
