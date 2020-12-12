@@ -101,8 +101,21 @@ Resources:
       Users:
         - !Ref TikTakDynamoApiUser
 
+  TikTakApiKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref TikTakDynamoApiUser
+
 
 Outputs:
-  TikTakTable:
-    Description: Table Created using this template.
+  TikTakDynamoDB:
+    Description: Dynamo DB Created using this template.
     Value: !Ref TikTakDynamoDB
+
+  TikTakApiAccessKey:
+    Description: API Access Key for DynamoDB
+    Value: !Ref TikTakApiKeys
+
+  TikTakSecretAccessKey:
+    Description: API Secret Key for DynamoDB
+    Value: !GetAtt TikTakApiKeys.SecretAccessKey
