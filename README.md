@@ -11,3 +11,9 @@ and also examine the games which others have played.
 - playable tic-tac-toe
 - examination of previous tic-tac-toe games
 - other things IDK
+
+## AWS deploy
+
+```bash
+aws cloudformation create-stack --stack-name TikTak --template-body file://tiktak.yaml
+```

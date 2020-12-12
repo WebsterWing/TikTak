@@ -21,7 +21,7 @@ Parameters:
     Description: Write Capacity Units
 
 Resources:
-  TikTakTable:
+  TikTakDynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
       TableName: TikTakTable
@@ -78,15 +78,31 @@ Resources:
           Key: Name
           Value: TikTakDynamoDB
 
-            #   TikTakDBPolicy:
-            #     Type: AWS::IAM::Role
-            #     Properties:
-            #       Description: IAM role for read and write from dynamodb database
-            #       Policies:
+  TikTakDynamoApiUser:
+    Type: AWS::IAM::User
+    Properties:
+      Tags:
+        -
+          Key: Name
+          Value: TikTakDynamoApiUser
 
+  TikTakDynamoAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: TikTakDynamoAccessPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action:
+            - "dynamodb:*"
+          Resource:
+            - !GetAtt TikTakDynamoDB.Arn
+      Users:
+        - !Ref TikTakDynamoApiUser
 
 
 Outputs:
   TikTakTable:
     Description: Table Created using this template.
-    Value: !Ref TikTakTable
+    Value: !Ref TikTakDynamoDB
