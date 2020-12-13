@@ -29,7 +29,7 @@ class TikTakApiApplicationTests {
 		
 		repository.save(g);
 		
-		assert(!g.getId().equals("GAME#null"));
+		 assert(!g.getId().equals("GAME#null"));
 	}
 
 	@Test
