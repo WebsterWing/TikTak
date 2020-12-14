@@ -93,9 +93,31 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-        - Effect: Allow
+        -
+          Sid: ListAndDescribe
+          Effect: Allow
           Action:
-            - "dynamodb:*"
+            - "dynamodb:List*",
+            - "dynamodb:DescribeReservedCapacity*",
+            - "dynamodb:DescribeLimits",
+            - "dynamodb:DescribeTimeToLive"
+          Resource:
+            - "*"
+        -
+          Sid: SpecificTable
+          Effect: Allow
+          Action:
+            - "dynamodb:BatchGet*",
+            - "dynamodb:DescribeStream",
+            - "dynamodb:DescribeTable",
+            - "dynamodb:Get*",
+            - "dynamodb:Query",
+            - "dynamodb:Scan",
+            - "dynamodb:BatchWrite*",
+            - "dynamodb:CreateTable",
+            - "dynamodb:Delete*",
+            - "dynamodb:Update*",
+            - "dynamodb:PutItem"
           Resource:
             - !GetAtt TikTakDynamoDB.Arn
       Users:
@@ -111,6 +133,10 @@ Outputs:
   TikTakDynamoDB:
     Description: Dynamo DB Created using this template.
     Value: !Ref TikTakDynamoDB
+
+  TikTakDynamoDBArn:
+    Description: Dynamo DB Arn Created using this template.
+    Value: !GetAtt TikTakDynamoDB.Arn
 
   TikTakApiAccessKey:
     Description: API Access Key for DynamoDB
