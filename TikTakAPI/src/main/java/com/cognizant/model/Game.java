@@ -44,11 +44,18 @@ public class Game extends SingleTableModel{
 	}
 
 	@DynamoDBHashKey(attributeName = "PK")
+	public String getPkQuery() {
+		return super.getPkQuery();
+	}
+	public void setPkQuery(String id) {
+		super.setPkQuery(id);
+	}
+	
 	public String getId() {
-		return getPkQuery();
+		return getPk();
 	}
 	public void setId(String id) {
-		setPkQuery(id);
+		setPk(id);
 	}
 
 	// Not sure why RangeKey doesnt work but HashKey works
