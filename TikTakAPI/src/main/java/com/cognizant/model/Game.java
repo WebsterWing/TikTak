@@ -63,6 +63,9 @@ public class Game extends SingleTableModel{
 	public String getMetadata() {
 		return getSkQuery();
 	}
+	public void setMetadata(String date) {
+		setSkQuery(date);
+	}
 
 	@DynamoDBAttribute(attributeName = "gameMoves")
 	public List<GameMove> getGameMoves() {

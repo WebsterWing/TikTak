@@ -9,9 +9,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.cognizant.model.Game;
 
-@EnableScan
 public interface PagingGameRepository extends PagingAndSortingRepository<Game, String>{
 
-	// @EnableScanCount
+    @EnableScan
+	@EnableScanCount
 	Page<Game> findAll(Pageable pageable);
 }
