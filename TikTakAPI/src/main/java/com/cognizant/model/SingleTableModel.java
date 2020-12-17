@@ -41,6 +41,11 @@ public class SingleTableModel {
 		this.pk = pk;
 		this.sk = sk;
 	}
+	
+	public void clearKeys() {
+		pk = null;
+		sk = null;
+	}
 
 	protected String getPkQuery() {
         return pkPrefix + "#" + getPk();
