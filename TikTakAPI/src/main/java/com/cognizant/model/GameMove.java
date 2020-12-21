@@ -9,6 +9,7 @@ public class GameMove {
 	private int col;
 	private String player;
 	private String username;
+
 	public GameMove(int row, int col, String player, String username) {
 		super();
 		this.row = row;
