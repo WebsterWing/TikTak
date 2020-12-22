@@ -2,8 +2,11 @@ package com.cognizant.ai;
 
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import com.cognizant.model.GameMove;
 
+@Component
 public abstract class TicTacAI {
 	// player true for first, false for second (X)
 	public Boolean checkWin(Boolean[][] board, boolean player) {
@@ -83,7 +86,7 @@ public abstract class TicTacAI {
 	
 	// return true if next player should be circle
 	public boolean getNextPlayer(List<GameMove> gameMoves) {
-		return gameMoves.size() % 2 != 0;
+		return gameMoves.size() % 2 == 0;
 	}
 	
 	public abstract GameMove getNextMove(List<GameMove> gameMoves);

@@ -15,7 +15,7 @@ public class TicTacPlayerController {
 	@Autowired
 	private TicTacRandomAI randomAI;
 
-    @PostMapping(path = "/tictac/random", consumes = "application/json", produces = "application/json")
+    @PostMapping("/tictac/random")
     public GameMove getGameMove(@RequestBody List<GameMove> gameMoves) {
     	return randomAI.getNextMove(gameMoves);
     }
