@@ -1,4 +1,4 @@
-package com.cognizant;
+package com.cognizant.ai;
 
 import java.util.List;
 
@@ -81,5 +81,10 @@ public abstract class TicTacAI {
 		return board;
     }
 	
-	public abstract GameMove nextMove(List<GameMove> gameMoves);
+	// return true if next player should be circle
+	public boolean getNextPlayer(List<GameMove> gameMoves) {
+		return gameMoves.size() % 2 != 0;
+	}
+	
+	public abstract GameMove getNextMove(List<GameMove> gameMoves);
 }
