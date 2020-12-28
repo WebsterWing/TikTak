@@ -29,7 +29,7 @@ public class Game extends SingleTableModel{
 	private List<GameMove> gameMoves;
 
 	public Game() {
-		super("GAME", null, "METADATA", null);
+		super(null, null);
 		gameMoves = new ArrayList<GameMove>();
 	}
 
@@ -42,6 +42,15 @@ public class Game extends SingleTableModel{
 		this.createdTime = createdTime;
 		this.updatedTime = updatedTime;
 		this.gameMoves = gameMoves;
+	}
+	
+	@DynamoDBIgnore
+	public String getPkPrefix() {
+		return "GAME";
+	}
+	@DynamoDBIgnore
+	public String getSkPrefix() {
+		return "METADATA";
 	}
 
 	@DynamoDBHashKey(attributeName = "PK")

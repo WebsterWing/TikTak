@@ -34,6 +34,12 @@
     </dependencyManagement>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-stomp</artifactId>
+            <version>5.4.2</version>
+        </dependency>
+
 		<dependency>
 			<groupId>com.github.derjust</groupId>
 			<artifactId>spring-data-dynamodb</artifactId>

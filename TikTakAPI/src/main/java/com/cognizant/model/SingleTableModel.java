@@ -6,27 +6,23 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.cognizant.Helpers;
 
-public class SingleTableModel {
+public abstract class SingleTableModel {
 	private String pk;
 	private String sk;
 	
-	private final String pkPrefix;
 	private int pkPrefixLen;
-
-	private final String skPrefix;
 	private int skPrefixLen;
 	
-	public SingleTableModel(String pkPrefix,
-			String pk,String skPrefix, String sk) throws IllegalArgumentException {
+	public SingleTableModel(String pk, String sk) throws IllegalArgumentException {
+		String pkPrefix = getPkPrefix();
+		String skPrefix = getSkPrefix();
+
 		if (pkPrefix == null) {
 			throw new IllegalArgumentException("pkPrefix is null");
 		}
 		if (skPrefix == null) {
 			throw new IllegalArgumentException("skPrefix is null");
 		}
-
-		this.pkPrefix = pkPrefix;
-		this.skPrefix = skPrefix;
 
 		this.pkPrefixLen = pkPrefix.length();
 		this.skPrefixLen = skPrefix.length();
@@ -42,13 +38,16 @@ public class SingleTableModel {
 		this.sk = sk;
 	}
 	
+	public abstract String getPkPrefix();
+	public abstract String getSkPrefix();
+	
 	public void clearKeys() {
 		pk = null;
 		sk = null;
 	}
 
 	protected String getPkQuery() {
-        return pkPrefix + "#" + getPk();
+        return getPkPrefix() + "#" + getPk();
 	}
 	protected void setPkQuery(String pkQuery) {
 		pk = pkQuery.substring(pkPrefixLen + 1);
@@ -65,7 +64,7 @@ public class SingleTableModel {
 	}
 
 	protected String getSkQuery() {
-        return skPrefix + "#" + getSk();
+        return getSkPrefix() + "#" + getSk();
 	}
 	protected void setSkQuery(String skQuery) {
 		sk = skQuery.substring(skPrefixLen + 1);

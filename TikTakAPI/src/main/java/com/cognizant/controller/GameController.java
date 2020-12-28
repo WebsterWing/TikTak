@@ -1,8 +1,12 @@
 package com.cognizant.controller;
 
 import java.util.ArrayList;
+
+import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +30,8 @@ public class GameController {
 	private PagingGameRepository gameRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(GameController.class);
-	
-	@GetMapping("/games")
+    
+    @GetMapping("/games")
 	public List<Game> games(
 			@RequestParam(value = "page", defaultValue = "1")
 			String pageParam,
@@ -45,7 +49,29 @@ public class GameController {
 		return list;
 	}
 	
-	@PostMapping(path = "/games", consumes = "application/json", produces = "application/json")
+    /*
+	@GetMapping("/games")
+	public List<Game> games() {
+		
+        List<Game> page = gameRepository.findAll();
+		
+		// Logger.log(Level.INFO, list.toString());
+		return page;
+	}
+
+	@PostMapping("/games")
+	public QueryResultPage<Game> gamesWithStartKey(
+			@RequestBody Map<String, AttributeValue> startKey
+			) {
+		
+        QueryResultPage<Game> page = gameRepository.findAll(startKey);
+		
+		// Logger.log(Level.INFO, list.toString());
+		return page;
+	}
+	*/
+
+    @PostMapping(path = "/games", consumes = "application/json", produces = "application/json")
 	public Game addGame(@RequestBody Game game) {
 		game.clearKeys();
 		logger.info("START POST game");
