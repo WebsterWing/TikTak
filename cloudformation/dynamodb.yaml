@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak DynamoDB instance
+
+Parameters:
+  HashKeyElementName:
+    Type: String
+    Default: EmployeeId
+    Description: Hash Key Name
+  HashKeyElementType:
+    Type: String
+    Default: S
+    Description: Hash Key Type
+
+  ReadCapacityUnits:
+    Type: Number
+    Default: 5
+    Description: Read Capacity Units
+  WriteCapacityUnits:
+    Type: Number
+    Default: 5
+    Description: Write Capacity Units
+
+Resources:
+  TikTakDynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TikTakTable
+      AttributeDefinitions:
+        # Primary and Sort Keys
+        -
+          AttributeName: PK
+          AttributeType: S
+        -
+          AttributeName: SK
+          AttributeType: S
+
+        -
+          AttributeName: GS1PK
+          AttributeType: S
+        -
+          AttributeName: GS1SK
+          AttributeType: S
+
+      KeySchema:
+        -
+          AttributeName: PK
+          KeyType: HASH
+        -
+          AttributeName: SK
+          KeyType: RANGE
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnits
+        WriteCapacityUnits: !Ref WriteCapacityUnits
+
+      GlobalSecondaryIndexes:
+        -
+          IndexName: TikTakGSI1
+
+          KeySchema:
+            # Primary and Sort Keys
+            -
+              AttributeName: GS1PK
+              KeyType: HASH
+            -
+              AttributeName: GS1SK
+              KeyType: RANGE
+
+          Projection:
+            ProjectionType: KEYS_ONLY
+
+          ProvisionedThroughput:
+            ReadCapacityUnits: !Ref ReadCapacityUnits
+            WriteCapacityUnits: !Ref WriteCapacityUnits
+
+      Tags:
+        -
+          Key: Name
+          Value: TikTakDynamoDB
+
+  TikTakDynamoApiUser:
+    Type: AWS::IAM::User
+    Properties:
+      Tags:
+        -
+          Key: Name
+          Value: TikTakDynamoApiUser
+
+  TikTakDynamoAccessPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: TikTakDynamoAccessPolicy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        -
+          Sid: ListAndDescribe
+          Effect: Allow
+          Action:
+            - "dynamodb:List*",
+            - "dynamodb:DescribeReservedCapacity*",
+            - "dynamodb:DescribeLimits",
+            - "dynamodb:DescribeTimeToLive"
+          Resource:
+            - "*"
+        -
+          Sid: SpecificTable
+          Effect: Allow
+          Action:
+            - "dynamodb:BatchGet*",
+            - "dynamodb:DescribeStream",
+            - "dynamodb:DescribeTable",
+            - "dynamodb:Get*",
+            - "dynamodb:Query",
+            - "dynamodb:Scan",
+            - "dynamodb:BatchWrite*",
+            - "dynamodb:CreateTable",
+            - "dynamodb:Delete*",
+            - "dynamodb:Update*",
+            - "dynamodb:PutItem"
+          Resource:
+            - !GetAtt TikTakDynamoDB.Arn
+      Users:
+        - !Ref TikTakDynamoApiUser
+
+  TikTakApiKeys:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref TikTakDynamoApiUser
+
+
+Outputs:
+  TikTakDynamoDB:
+    Description: Dynamo DB Created using this template.
+    Value: !Ref TikTakDynamoDB
+
+  TikTakDynamoDBArn:
+    Description: Dynamo DB Arn Created using this template.
+    Value: !GetAtt TikTakDynamoDB.Arn
+
+  TikTakApiAccessKey:
+    Description: API Access Key for DynamoDB
+    Value: !Ref TikTakApiKeys
+
+  TikTakSecretAccessKey:
+    Description: API Secret Key for DynamoDB
+    Value: !GetAtt TikTakApiKeys.SecretAccessKey

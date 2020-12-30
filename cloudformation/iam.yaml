@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak Keypairs and Users
+
+Parameters:
+  DynamoDBPolicyArn:
+    Type: String
+    Description: TikTakDynamoDB Arn
+
+Resources:
+  TikTakBackendRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+      Version: 2012-10-17
+      Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+            - 'sts:AssumeRole'
+
+      ManagedPolicyArns:
+        - DynamoDBPolicy
+
+      Tags:
+        -
+          Key: Name
+          Value: TikTakBackendRole
+
+Outputs:
+  TikTakBackendRole:
+    Description: TikTak Backend Role Arn
+    Value: !GetAtt TikTakBackendRole.Arn
