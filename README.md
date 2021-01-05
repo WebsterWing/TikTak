@@ -15,6 +15,7 @@ and also examine the games which others have played.
 ## AWS deploy
 
 ```bash
-aws cloudformation create-stack --stack-name TikTak --template-body file://tiktak.yaml 
+cd cloudformation
+aws cloudformation create-stack --stack-name TikTak --template-body file://master.yaml 
 --capabilities CAPABILITY_IAM
 ```
