@@ -1,0 +1,72 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  BucketName:
+    Description: Name of S3 config bucket
+    Type: String
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BucketName
+      VersioningConfiguration:
+        Status: Suspended
+    DeletionPolicy: Delete
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Allow
+            Resource:
+              - !Join [ '', [ 'arn:aws:s3:::', !Ref S3Bucket, '/*' ] ]
+            Principal: "*"
+
+      # CloudformationConfigKeys:
+      #   Type: AWS::IAM::AccessKey
+      #   Properties:
+      #     UserName: !Ref CloudformationConfigS3User
+
+      # CloudformationDeployPolicy:
+      #   Type: AWS::IAM::Policy
+      #   Properties:
+      #     PolicyName: CloudformationDeployPolicy
+      #     PolicyDocument:
+      #       Version: 2012-10-17
+      #       Statement:
+      #       -
+      #         Effect: Allow
+      #         Action: "dynamodb:*",
+      #         Resource: "*"
+      #       -
+      #         Effect: Allow
+      #         Action: "cloudformation:*",
+      #         Resource: "*"
+      #     Users:
+      #       - !Ref TikTakDynamoApiUser
+
+      # CloudformationConfigS3User:
+      #   Type: AWS::IAM::User
+      #   Properties:
+      #     Tags:
+      #       -
+      #         Key: Name
+      #         Value: CloudformationS3User
+
+Outputs:
+  S3BucketDomain:
+    Description: S3 Bucket Domain name
+    Value: !GetAtt S3Bucket.DomainName
+
+      # S3AccessKey:
+      #   Description: Access Key for S3 Cloudformation config bucket
+      #   Value: !Ref CloudformationConfigKeys
+
+      # S3SecretAccessKey:
+      #   Description: Secret Key for S3 Cloudformation config bucket
+      #   Value: !GetAtt CloudformationConfigKeys.SecretAccessKey

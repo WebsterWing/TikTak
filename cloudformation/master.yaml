@@ -1,16 +1,36 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: AWS CloudFormation Template for TikTak Project
 
+Parameters:
+  BucketUrl:
+    Description: URL of S3 config bucket
+    Type: String
+
 Resources:
   DynamoDBStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: dynamodb.yaml
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref BucketUrl
+          - /
+          - dynamodb.yaml
   IamStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: iam.yaml
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref BucketUrl
+          - /
+          - iam.yaml
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: ec2.yaml
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref BucketUrl
+          - /
+          - ec2.yaml
