@@ -383,9 +383,9 @@ Resources:
       SubnetId: !Ref SubnetId
       InstanceType:
         Ref: InstanceType
-      SecurityGroups:
-      - Ref: InstanceSecurityGroup
-      - Ref: SpringGroup
+      SecurityGroupIds:
+      - !GetAtt InstanceSecurityGroup.GroupId
+      - !GetAtt SpringGroup.GroupId
       KeyName:
         Ref: KeyName
       ImageId:

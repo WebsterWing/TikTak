@@ -7,7 +7,7 @@ for i in **/*.yaml; do # Whitespace-safe and recursive
     aws cloudformation validate-template --template-body "file://$i"
 
     if [ $? -ne 0 ]; then
-        echo "\nFailure on file: $i"
+        echo -e "\nFailure on file: $i"
         exit 1
     fi
 
