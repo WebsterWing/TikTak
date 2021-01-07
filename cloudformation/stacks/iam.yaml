@@ -4,31 +4,55 @@ Description: AWS CloudFormation Template for TikTak Keypairs and Users
 Parameters:
   DynamoDBPolicyArn:
     Type: String
-    Description: TikTakDynamoDB Arn
+    Description: TikTak DynamoDB Policy Arn
 
 Resources:
   TikTakBackendRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-      Version: 2012-10-17
-      Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-            - ec2.amazonaws.com
-          Action:
-            - 'sts:AssumeRole'
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
 
       ManagedPolicyArns:
-        - DynamoDBPolicy
+        - !Ref DynamoDBPolicyArn
 
       Tags:
         -
           Key: Name
           Value: TikTakBackendRole
 
+            # TikTakEC2User:
+            #   Type: AWS::IAM::User
+            #   Properties:
+            #     Tags:
+            #       -
+            #         Key: Name
+            #         Value: TikTakEC2User
+
+            # TikTakEC2Key:
+            #   Type: AWS::IAM::AccessKey
+            #   Properties:
+            #     UserName: !Ref TikTakEC2User
+
 Outputs:
-  TikTakBackendRole:
+  BackendRoleName:
+    Description: TikTak Backend Role Name
+    Value: !Ref TikTakBackendRole
+  BackendRoleArn:
     Description: TikTak Backend Role Arn
     Value: !GetAtt TikTakBackendRole.Arn
+
+      # EC2AccessKey:
+      #   Description: Access Key for EC2
+      #   Value: !Ref TikTakEC2Key
+
+      # EC2SecretAccessKey:
+      #   Description: Secret Key for EC2
+      #   Value: !GetAtt TikTakEC2Key.SecretAccessKey

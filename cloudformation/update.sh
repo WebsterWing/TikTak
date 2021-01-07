@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
+KEY_NAME=tiktak-ec2-keypair
 STACK_NAME=TikTak
 CONFIG_STACK_NAME=TikTakConfig
 BUCKET_NAME=tiktak-config
-BUCKET_URL=https://tiktak-config.s3.amazonaws.com/
+
+echo -e "Linting\n"
+./lint.sh
+if [ $? -ne 0 ]; then
+    exit 1
+fi
 
 echo -e "Update Config Cloudformation Stack"
 echo -e "\tConfig Stack Name: $CONFIG_STACK_NAME"
@@ -38,4 +44,6 @@ aws cloudformation update-stack \
     --stack-name $STACK_NAME \
     --template-body file://master.yaml \
     --capabilities CAPABILITY_IAM \
-    --parameters ParameterKey=BucketUrl,ParameterValue=$BUCKET_URL
+    --capabilities CAPABILITY_NAMED_IAM \
+    --parameters ParameterKey=BucketUrl,ParameterValue=$BUCKET_URL \
+    ParameterKey=KeyName,ParameterValue=$KEY_NAME

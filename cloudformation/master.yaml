@@ -5,6 +5,11 @@ Parameters:
   BucketUrl:
     Description: URL of S3 config bucket
     Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+    Default: tiktak-ec2-keypair
 
 Resources:
   DynamoDBStack:
@@ -16,7 +21,8 @@ Resources:
           - !Ref BucketUrl
           - /
           - dynamodb.yaml
-  IamStack:
+
+  IAMStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Join
@@ -25,6 +31,21 @@ Resources:
           - !Ref BucketUrl
           - /
           - iam.yaml
+      Parameters:
+        DynamoDBPolicyArn: !GetAtt DynamoDBStack.Outputs.DynamoDBPolicyArn
+
+  VPCStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref BucketUrl
+          - /
+          - vpc.yaml
+      Parameters:
+        EnvironmentName: "TikTak"
+
   EC2Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -34,3 +55,9 @@ Resources:
           - !Ref BucketUrl
           - /
           - ec2.yaml
+
+      Parameters:
+        KeyName: !Ref KeyName
+        SubnetId: !GetAtt VPCStack.Outputs.PublicSubnet1
+        VPC: !GetAtt VPCStack.Outputs.VPC
+        BackendRoleName: !GetAtt IAMStack.Outputs.BackendRoleName

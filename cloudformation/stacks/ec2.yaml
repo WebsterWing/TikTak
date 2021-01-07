@@ -6,6 +6,16 @@ Description: 'AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSam
   EC2 instance. You will be billed for the AWS resources used if you create a stack
   from this template.'
 Parameters:
+  BackendRoleName:
+    Description: Role Name of TikTak Backend Role
+    Type: String
+  VPC:
+    Description: VPC ID
+    Type: String
+  SubnetId:
+    Description: Subnet to launch instance into
+    Type: String
+
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: AWS::EC2::KeyPair::KeyName
@@ -367,7 +377,10 @@ Mappings:
 Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
+    DependsOn:
+      - TikTakBackendInstanceProfile
     Properties:
+      SubnetId: !Ref SubnetId
       InstanceType:
         Ref: InstanceType
       SecurityGroups:
@@ -383,7 +396,14 @@ Resources:
           - AWSInstanceType2Arch
           - Ref: InstanceType
           - Arch
-      IamInstanceProfile: TikTakBackendRole
+      IamInstanceProfile: TikTakBackendInstanceProfile
+
+  TikTakBackendInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: TikTakBackendInstanceProfile
+      Roles:
+        - !Ref BackendRoleName
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -395,6 +415,7 @@ Resources:
         ToPort: 22
         CidrIp:
           Ref: SSHLocation
+      VpcId: !Ref VPC
 
   SpringGroup:
     Type: AWS::EC2::SecurityGroup
@@ -410,6 +431,7 @@ Resources:
         FromPort: 8000
         ToPort: 8000
         CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
 
 Outputs:
   InstanceId:
