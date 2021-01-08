@@ -9,6 +9,9 @@ Parameters:
   BackendRoleName:
     Description: Role Name of TikTak Backend Role
     Type: String
+  CodeDeployRoleName:
+    Description: Role Name of Code Deploy Role
+    Type: String
   VPC:
     Description: VPC ID
     Type: String
@@ -397,6 +400,23 @@ Resources:
           - Ref: InstanceType
           - Arch
       IamInstanceProfile: TikTakBackendInstanceProfile
+
+      UserData:
+        !Base64 |
+        #!/bin/bash
+        yum -y update
+        yum install -y ruby
+        yum install -y aws-cli
+        yum install -y nodejs
+        cd /home/ec2-user
+        aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
+        chmod +x ./install
+        ./install auto
+
+      Tags:
+        -
+          Key: Name
+          Value: TikTakEC2
 
   TikTakBackendInstanceProfile:
     Type: AWS::IAM::InstanceProfile

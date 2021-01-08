@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak CodeDeploy
+
+Parameters:
+  CodeDeployRoleArn:
+    Description: Code Deploy Role Arn
+    Type: String
+
+  Repository:
+    Description: Github Repository for Code Deploy
+    Type: String
+
+  CommitId:
+    Description: Github CommitId for Code Deploy
+    Type: String
+
+Resources:
+  # CodeDeployConfig:
+  #   Type: AWS::CodeDeploy::DeploymentConfig
+  #   Properties:
+  #     DeploymentConfigName: TikTakCodeDeployConfig
+  #     MinimumHealthyHosts:
+  #       Type: "HOST_COUNT"
+  #       Value: 1
+
+  CodeDeployApplication:
+    Type: AWS::CodeDeploy::Application
+    # DependsOn: CodeDeployConfig
+    Properties:
+      ApplicationName: TikTakApplication
+      ComputePlatform: Server
+
+  DeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DependsOn: CodeDeployApplication
+    Properties:
+      ApplicationName: !Ref CodeDeployApplication
+      Deployment:
+        Description: "Code Deployment"
+        IgnoreApplicationStopFailures: true
+        Revision:
+          RevisionType: GitHub
+          GitHubLocation:
+            CommitId:
+              Ref: CommitId
+            Repository:
+              Ref: Repository
+      DeploymentConfigName: CodeDeployDefault.AllAtOnce
+      # !Ref CodeDeployApplication
+      ServiceRoleArn: !Ref CodeDeployRoleArn
+      Ec2TagFilters:
+        -
+          Key: Name
+          Value: TikTakEC2
+          Type: KEY_AND_VALUE
+
+# Outputs:
+#   BackendRoleName:
+#     Description: TikTak Backend Role Name
+#     Value: !Ref TikTakBackendRole

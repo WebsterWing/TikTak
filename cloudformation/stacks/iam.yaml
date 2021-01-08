@@ -18,28 +18,43 @@ Resources:
               Service:
               - ec2.amazonaws.com
             Action:
-              - 'sts:AssumeRole'
+              - "sts:AssumeRole"
+                # - "autoscaling:Describe*"
+                # - "cloudformation:Describe*"
+                # - "cloudformation:GetTemplate",
 
       ManagedPolicyArns:
         - !Ref DynamoDBPolicyArn
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy'
+        - 'arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole'
 
       Tags:
         -
           Key: Name
           Value: TikTakBackendRole
 
-            # TikTakEC2User:
-            #   Type: AWS::IAM::User
-            #   Properties:
-            #     Tags:
-            #       -
-            #         Key: Name
-            #         Value: TikTakEC2User
+  CodeDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
 
-            # TikTakEC2Key:
-            #   Type: AWS::IAM::AccessKey
-            #   Properties:
-            #     UserName: !Ref TikTakEC2User
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole'
+          # - 'arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforAWSCodeDeploy'
+          # - 'arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole'
+
+      Tags:
+        -
+          Key: Name
+          Value: CodeDeployRole
 
 Outputs:
   BackendRoleName:
@@ -49,10 +64,9 @@ Outputs:
     Description: TikTak Backend Role Arn
     Value: !GetAtt TikTakBackendRole.Arn
 
-      # EC2AccessKey:
-      #   Description: Access Key for EC2
-      #   Value: !Ref TikTakEC2Key
-
-      # EC2SecretAccessKey:
-      #   Description: Secret Key for EC2
-      #   Value: !GetAtt TikTakEC2Key.SecretAccessKey
+  CodeDeployRoleName:
+    Description: Code Deploy Role Name
+    Value: !Ref CodeDeployRole
+  CodeDeployRoleArn:
+    Description: Code Deploy Role Arn
+    Value: !GetAtt CodeDeployRole.Arn

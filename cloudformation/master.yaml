@@ -11,6 +11,13 @@ Parameters:
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
     Default: tiktak-ec2-keypair
 
+  Repository:
+    Description: Github Repository for Code Deploy
+    Type: String
+  CommitId:
+    Description: Github CommitId for Code Deploy
+    Type: String
+
 Resources:
   DynamoDBStack:
     Type: AWS::CloudFormation::Stack
@@ -61,3 +68,27 @@ Resources:
         SubnetId: !GetAtt VPCStack.Outputs.PublicSubnet1
         VPC: !GetAtt VPCStack.Outputs.VPC
         BackendRoleName: !GetAtt IAMStack.Outputs.BackendRoleName
+        CodeDeployRoleName: !GetAtt IAMStack.Outputs.CodeDeployRoleName
+
+  CodeDeployStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EC2Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref BucketUrl
+          - /
+          - codedeploy.yaml
+      Parameters:
+        CodeDeployRoleArn: !GetAtt IAMStack.Outputs.CodeDeployRoleArn
+        Repository: !Ref Repository
+        CommitId: !Ref CommitId
+
+Outputs:
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value: !GetAtt EC2Stack.Outputs.PublicDNS
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value: !GetAtt EC2Stack.Outputs.PublicIP

@@ -5,6 +5,11 @@ STACK_NAME=TikTak
 CONFIG_STACK_NAME=TikTakConfig
 BUCKET_NAME=tiktak-config
 
+# REPOSITORY=WebsterWing/tiktak-frontend
+# COMMIT_ID=106d3f7edb419176473f51036e9e5aaa29bfaffa
+REPOSITORY=WebsterWing/tiktak-node
+COMMIT_ID=c78fc8caddd4cd1f8b595cfaac4af0a8ae6827ff
+
 echo -e "Linting\n"
 ./lint.sh
 if [ $? -ne 0 ]; then
@@ -46,4 +51,6 @@ aws cloudformation update-stack \
     --capabilities CAPABILITY_IAM \
     --capabilities CAPABILITY_NAMED_IAM \
     --parameters ParameterKey=BucketUrl,ParameterValue=$BUCKET_URL \
-    ParameterKey=KeyName,ParameterValue=$KEY_NAME
+    ParameterKey=KeyName,ParameterValue=$KEY_NAME \
+    ParameterKey=Repository,ParameterValue=$REPOSITORY \
+    ParameterKey=CommitId,ParameterValue=$COMMIT_ID
