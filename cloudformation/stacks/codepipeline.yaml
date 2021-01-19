@@ -61,7 +61,7 @@ Resources:
         Location: !Ref S3Build
 
       Name: TikTakCodePipeline
-      RestartExecutionOnUpdate: true
+      # RestartExecutionOnUpdate: true
       RoleArn: !Ref CodePipelineRoleArn
 
       Stages:
