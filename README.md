@@ -15,7 +15,9 @@ and also examine the games which others have played.
 ## AWS deploy
 
 ```bash
+# create keypair for EC2 Instance, save for ssh
+aws ec2 create-key-pair --key-name tiktak-ec2-keypair --query "KeyMaterial" --output text > ~/tiktak.pem
+
 cd cloudformation
-aws cloudformation create-stack --stack-name TikTak --template-body file://master.yaml 
---capabilities CAPABILITY_IAM
+./update.sh
 ```
