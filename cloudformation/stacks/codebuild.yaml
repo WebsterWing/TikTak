@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak frontend CodeBuild
+
+Parameters:
+  ServiceRoleArn:
+    Description: Service Role Arn for CodeBuild
+    Type: String
+
+Resources:
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Description: A description about my project
+      ServiceRole: !Ref ServiceRoleArn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/nodejs:latest
+          # EnvironmentVariables:
+          # - Name: REACT_APP_API_ENDPOINT
+          #   Value: !Ref ApiEndpoint
+      Source:
+        Type: CODEPIPELINE
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Name
+          Value: TikTakCodeBuild
+
+Outputs:
+  CodeBuildId:
+    Description: Id for CodeBuild
+    Value: !Ref CodeBuildProject

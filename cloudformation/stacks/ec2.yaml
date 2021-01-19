@@ -15,6 +15,9 @@ Parameters:
   VPC:
     Description: VPC ID
     Type: String
+  BackendPort:
+    Description: Backend port number
+    Type: Number
   SubnetId:
     Description: Subnet to launch instance into
     Type: String
@@ -391,14 +394,15 @@ Resources:
       - !GetAtt SpringGroup.GroupId
       KeyName:
         Ref: KeyName
-      ImageId:
-        Fn::FindInMap:
-        - AWSRegionArch2AMI
-        - Ref: AWS::Region
-        - Fn::FindInMap:
-          - AWSInstanceType2Arch
-          - Ref: InstanceType
-          - Arch
+      # Amazon Linux 2
+      ImageId: ami-0d9a6b6c74aafb9d7
+        #  Fn::FindInMap:
+        #  - AWSRegionArch2AMI
+        #  - Ref: AWS::Region
+        #  - Fn::FindInMap:
+        #    - AWSInstanceType2Arch
+        #    - Ref: InstanceType
+        #    - Arch
       IamInstanceProfile: TikTakBackendInstanceProfile
 
       UserData:
@@ -412,6 +416,9 @@ Resources:
         aws s3 cp s3://aws-codedeploy-us-east-2/latest/install . --region us-east-2
         chmod +x ./install
         ./install auto
+        systemctl enable codedeploy-agent
+        systemctl start codedeploy-agent
+        curl -sL https://rpm.nodesource.com/setup_15.x | bash -
 
       Tags:
         -
@@ -443,13 +450,13 @@ Resources:
       GroupDescription: Enable Spring access to world, port 8000
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8000
-        ToPort: 8000
+        FromPort: !Ref BackendPort
+        ToPort: !Ref BackendPort
         CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
       - IpProtocol: tcp
-        FromPort: 8000
-        ToPort: 8000
+        FromPort: !Ref BackendPort
+        ToPort: !Ref BackendPort
         CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
 

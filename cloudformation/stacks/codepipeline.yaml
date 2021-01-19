@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS CloudFormation Template for TikTak node CodeDeploy
+
+Parameters:
+  ApiEndpoint:
+    Description: API endpoint for frontend
+    Type: String
+
+  FrontendRepositoryId:
+    Description: Repository ID for Tiktak frontend
+    Type: String
+
+  BackendRepositoryId:
+    Description: Repository ID for Tiktak backend
+    Type: String
+
+  CodeBuildId:
+    Description: Code build ID for Tiktak frontend
+    Type: String
+
+  CodeDeployApplication:
+    Description: Code deploy application for Tiktak backend
+    Type: String
+
+  CodeDeployGroupName:
+    Description: Code deploy group name for Tiktak backend
+    Type: String
+
+  BackendRepositoryId:
+    Description: Repository ID for Tiktak backend
+    Type: String
+
+  CodePipelineRoleArn:
+    Description: Code Deploy Role Arn
+    Type: String
+
+  S3Build:
+    Description: S3 Bucket for build
+    Type: String
+
+  S3Website:
+    Description: S3 Bucket for website
+    Type: String
+
+Resources:
+  CodestarGithubConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: TikTakCodeStarGithubConnection
+      ProviderType: GitHub
+      Tags:
+        -
+          Key: Name
+          Value: TikTakCodeStarConnection
+
+  CodePipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Type: S3
+        Location: !Ref S3Build
+
+      Name: TikTakCodePipeline
+      RestartExecutionOnUpdate: true
+      RoleArn: !Ref CodePipelineRoleArn
+
+      Stages:
+        -
+          Name: Source
+          Actions:
+            -
+              Name: TikTak-Frontend-Source
+              RunOrder: 1
+              ActionTypeId:
+                Version: '1'
+                Owner: AWS
+                Category: Source
+                Provider: CodeStarSourceConnection
+              Configuration:
+                DetectChanges: true
+                ConnectionArn: !GetAtt CodestarGithubConnection.ConnectionArn
+                FullRepositoryId: !Ref FrontendRepositoryId
+                BranchName: "main"
+                OutputArtifactFormat: "CODE_ZIP"
+              OutputArtifacts:
+                - Name: TiktakFrontendSource
+            -
+              Name: TikTak-Backend-Source
+              RunOrder: 1
+              ActionTypeId:
+                Version: '1'
+                Owner: AWS
+                Category: Source
+                Provider: CodeStarSourceConnection
+              Configuration:
+                DetectChanges: true
+                ConnectionArn: !GetAtt CodestarGithubConnection.ConnectionArn
+                FullRepositoryId: !Ref BackendRepositoryId
+                BranchName: "main"
+                OutputArtifactFormat: "CODE_ZIP"
+              OutputArtifacts:
+                - Name: TiktakBackendSource
+        -
+          Name: Build
+          Actions:
+            -
+              Name: TikTak-Frontend-Build
+              RunOrder: 1
+              InputArtifacts:
+                - Name: TikTakFrontendSource
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                BatchEnabled: true
+                CombineArtifacts: true
+                ProjectName: !Ref CodeBuildId
+                PrimarySource: TikTak-Frontend-Source
+                EnvironmentVariables: !Sub
+                  - '[{"name": "REACT_APP_API_ENDPOINT", "value": "${ApiEndpoint}"}]'
+                  - { ApiEndpoint: !Ref ApiEndpoint }
+              OutputArtifacts:
+                - Name: TikTakFrontendBuild
+        -
+          Name: Deploy
+          Actions:
+            # -
+            #   Name: TikTak-Frontend-Deploy
+            #   RunOrder: 3
+            #   InputArtifacts:
+            #     - Name: TikTak-Frontend-Build
+            #   ActionTypeId:
+            #     Category: Deploy
+            #     Owner: AWS
+            #     Provider: S3
+            #     Version: '1'
+            #   Configuration:
+            #     S3Bucket: !Ref S3Website
+            #     S3ObjectKey: index.html
+            #   OutputArtifacts:
+            #     - Name: TikTak-Frontend-Website
+            -
+              Name: TikTak-Backend-Deploy
+              RunOrder: 1
+              InputArtifacts:
+                - Name: TiktakBackendSource
+              ActionTypeId:
+                Version: '1'
+                Owner: AWS
+                Category: Deploy
+                Provider: CodeDeploy
+              Configuration:
+                ApplicationName: !Ref CodeDeployApplication
+                DeploymentGroupName: !Ref CodeDeployGroupName
+              OutputArtifacts: []
+
+      Tags:
+        -
+          Key: Name
+          Value: TikTakCodePipeline

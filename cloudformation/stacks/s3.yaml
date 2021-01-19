@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  WebsiteBucketName:
+    Description: Name of S3 website bucket
+    Type: String
+  BuildBucketName:
+    Description: Name of S3 build bucket
+    Type: String
+
+Resources:
+  S3Website:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref WebsiteBucketName
+      AccessControl: PublicRead
+        # VersioningConfiguration:
+        #   Status: Suspended
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+    DeletionPolicy: Delete
+
+  S3Build:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref BuildBucketName
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Suspended
+    DeletionPolicy: Delete
+
+Outputs:
+  S3WebsiteDomain:
+    Description: S3 Website Domain name
+    Value: !GetAtt S3Website.DomainName
+
+  S3Website:
+    Description: S3 Website Bucket
+    Value: !Ref S3Website
+
+  S3BuildDomain:
+    Description: S3 Build Domain name
+    Value: !GetAtt S3Build.DomainName
+
+  S3Build:
+    Description: S3 Build Bucket
+    Value: !Ref S3Build

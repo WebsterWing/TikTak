@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: AWS CloudFormation Template for TikTak CodeDeploy
+Description: AWS CloudFormation Template for TikTak node CodeDeploy
 
 Parameters:
   CodeDeployRoleArn:
@@ -10,9 +10,9 @@ Parameters:
     Description: Github Repository for Code Deploy
     Type: String
 
-  CommitId:
-    Description: Github CommitId for Code Deploy
-    Type: String
+      # CommitId:
+      #   Description: Github CommitId for Code Deploy
+      #   Type: String
 
 Resources:
   # CodeDeployConfig:
@@ -35,18 +35,18 @@ Resources:
     DependsOn: CodeDeployApplication
     Properties:
       ApplicationName: !Ref CodeDeployApplication
-      Deployment:
-        Description: "Code Deployment"
-        IgnoreApplicationStopFailures: true
-        Revision:
-          RevisionType: GitHub
-          GitHubLocation:
-            CommitId:
-              Ref: CommitId
-            Repository:
-              Ref: Repository
+      # DeploymentGroupName: !Sub "${CodeDeployApplication}_TiktakDeploymentGroup"
+      # Deployment:
+      #   Description: "Code Deployment ${CommitId}"
+      #   IgnoreApplicationStopFailures: true
+      #   Revision:
+      #     RevisionType: GitHub
+      #     GitHubLocation:
+      #       CommitId:
+      #         Ref: CommitId
+      #       Repository:
+      #         Ref: Repository
       DeploymentConfigName: CodeDeployDefault.AllAtOnce
-      # !Ref CodeDeployApplication
       ServiceRoleArn: !Ref CodeDeployRoleArn
       Ec2TagFilters:
         -
@@ -54,7 +54,11 @@ Resources:
           Value: TikTakEC2
           Type: KEY_AND_VALUE
 
-# Outputs:
-#   BackendRoleName:
-#     Description: TikTak Backend Role Name
-#     Value: !Ref TikTakBackendRole
+Outputs:
+  CodeDeployApplication:
+    Description: TikTak Code Deploy Application
+    Value: !Ref CodeDeployApplication
+
+  CodeDeployGroupName:
+    Description: TikTak Code Deploy Group Name
+    Value: !Ref DeploymentGroup

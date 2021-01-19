@@ -2,21 +2,31 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: AWS CloudFormation Template for TikTak Project
 
 Parameters:
-  BucketUrl:
+  ConfigBucketUrl:
     Description: URL of S3 config bucket
     Type: String
+  WebsiteBucketName:
+    Description: Name of S3 website bucket
+    Type: String
+  BuildBucketName:
+    Description: Name of S3 build bucket
+    Type: String
+
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
     Default: tiktak-ec2-keypair
 
-  Repository:
+  FrontendRepository:
     Description: Github Repository for Code Deploy
     Type: String
-  CommitId:
-    Description: Github CommitId for Code Deploy
+  BackendRepository:
+    Description: Github Repository for Code Deploy
     Type: String
+      # CommitId:
+      #   Description: Github CommitId for Code Deploy
+      #   Type: String
 
 Resources:
   DynamoDBStack:
@@ -25,7 +35,7 @@ Resources:
       TemplateURL: !Join
         - ''
         - - "https://"
-          - !Ref BucketUrl
+          - !Ref ConfigBucketUrl
           - /
           - dynamodb.yaml
 
@@ -35,7 +45,7 @@ Resources:
       TemplateURL: !Join
         - ''
         - - "https://"
-          - !Ref BucketUrl
+          - !Ref ConfigBucketUrl
           - /
           - iam.yaml
       Parameters:
@@ -47,7 +57,7 @@ Resources:
       TemplateURL: !Join
         - ''
         - - "https://"
-          - !Ref BucketUrl
+          - !Ref ConfigBucketUrl
           - /
           - vpc.yaml
       Parameters:
@@ -59,7 +69,7 @@ Resources:
       TemplateURL: !Join
         - ''
         - - "https://"
-          - !Ref BucketUrl
+          - !Ref ConfigBucketUrl
           - /
           - ec2.yaml
 
@@ -69,6 +79,33 @@ Resources:
         VPC: !GetAtt VPCStack.Outputs.VPC
         BackendRoleName: !GetAtt IAMStack.Outputs.BackendRoleName
         CodeDeployRoleName: !GetAtt IAMStack.Outputs.CodeDeployRoleName
+        BackendPort: 8080
+
+  CodeBuildStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref ConfigBucketUrl
+          - /
+          - codebuild.yaml
+
+      Parameters:
+        ServiceRoleArn: !GetAtt IAMStack.Outputs.CodeBuildRoleArn
+
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref ConfigBucketUrl
+          - /
+          - s3.yaml
+      Parameters:
+        WebsiteBucketName: !Ref WebsiteBucketName
+        BuildBucketName: !Ref BuildBucketName
 
   CodeDeployStack:
     Type: AWS::CloudFormation::Stack
@@ -77,18 +114,44 @@ Resources:
       TemplateURL: !Join
         - ''
         - - "https://"
-          - !Ref BucketUrl
+          - !Ref ConfigBucketUrl
           - /
           - codedeploy.yaml
       Parameters:
         CodeDeployRoleArn: !GetAtt IAMStack.Outputs.CodeDeployRoleArn
-        Repository: !Ref Repository
-        CommitId: !Ref CommitId
+        Repository: !Ref BackendRepository
+          # CommitId: !Ref CommitId
 
-Outputs:
-  PublicDNS:
-    Description: Public DNSName of the newly created EC2 instance
-    Value: !GetAtt EC2Stack.Outputs.PublicDNS
-  PublicIP:
-    Description: Public IP address of the newly created EC2 instance
-    Value: !GetAtt EC2Stack.Outputs.PublicIP
+
+  CodePipelineStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref ConfigBucketUrl
+          - /
+          - codepipeline.yaml
+      Parameters:
+        S3Website: !GetAtt S3Stack.Outputs.S3Website
+        S3Build: !GetAtt S3Stack.Outputs.S3Build
+        ApiEndpoint: !Join
+          - ''
+          - - "http://"
+            - !GetAtt EC2Stack.Outputs.PublicDNS
+            - ":8080"
+        CodePipelineRoleArn: !GetAtt IAMStack.Outputs.CodePipelineRoleArn
+        FrontendRepositoryId: !Ref FrontendRepository
+        BackendRepositoryId: !Ref BackendRepository
+        CodeBuildId: !GetAtt CodeBuildStack.Outputs.CodeBuildId
+
+        CodeDeployApplication: !GetAtt CodeDeployStack.Outputs.CodeDeployApplication
+        CodeDeployGroupName: !GetAtt CodeDeployStack.Outputs.CodeDeployGroupName
+
+          # Outputs:
+          #   NatGateway1EIP:
+          #     Description: NATGateway 1
+          #     Value: !GetAtt VPCStack.Outputs.NatGateway1EIP
+          #   NatGateway2EIP:
+          #     Description: NATGateway 2
+          #     Value: !GetAtt VPCStack.Outputs.NatGateway2EIP
