@@ -6,6 +6,10 @@ Parameters:
     Type: String
     Description: TikTak DynamoDB Policy Arn
 
+      # CodeBuildPolicyArn:
+      #   Type: String
+      #   Description: TikTak Codebuild Policy Arn
+
 Resources:
   TikTakBackendRole:
     Type: AWS::IAM::Role
@@ -34,28 +38,6 @@ Resources:
           Key: Name
           Value: TikTakBackendRole
 
-  CodeBuildRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                # - ec2.amazonaws.com
-              - codebuild.amazonaws.com
-            Action:
-              - 'sts:AssumeRole'
-
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess"
-
-      Tags:
-        -
-          Key: Name
-          Value: CodeDeployRole
-
   CodeDeployRole:
     Type: AWS::IAM::Role
     Properties:
@@ -79,6 +61,64 @@ Resources:
         -
           Key: Name
           Value: CodeDeployRole
+
+  CodeBuildPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for CodeBuild Role
+      ManagedPolicyName: CodeBuildPolicy
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: CodeBuildDefaultPolicy
+          Effect: Allow
+          Action:
+          - codebuild:*
+          - iam:PassRole
+          Resource:
+            - "*"
+        - Sid: CloudWatchLogsAccessPolicy
+          Effect: Allow
+          Action:
+          - logs:FilterLogEvents
+          - logs:GetLogEvents
+          Resource: "*"
+        - Sid: S3AccessPolicy
+          Effect: Allow
+          Action:
+          - s3:CreateBucket
+          - s3:GetObject
+          - s3:List*
+          - s3:PutObject
+          Resource: "*"
+        - Sid: S3BucketIdentity
+          Effect: Allow
+          Action:
+          - s3:GetBucketAcl
+          - s3:GetBucketLocation
+          Resource: "*"
+
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                # - ec2.amazonaws.com
+              - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+
+      ManagedPolicyArns:
+        - !Ref CodeBuildPolicy
+
+      Tags:
+        -
+          Key: Name
+          Value: CodeBuildRole
 
 
   CodePipelinePolicy:

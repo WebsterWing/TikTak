@@ -50,6 +50,7 @@ Resources:
           - iam.yaml
       Parameters:
         DynamoDBPolicyArn: !GetAtt DynamoDBStack.Outputs.DynamoDBPolicyArn
+          # CodeBuildPolicyArn: !GetAtt CodeBuildStack.Outputs.CodeBuildPolicyArn
 
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -81,19 +82,6 @@ Resources:
         CodeDeployRoleName: !GetAtt IAMStack.Outputs.CodeDeployRoleName
         BackendPort: 8080
 
-  CodeBuildStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Join
-        - ''
-        - - "https://"
-          - !Ref ConfigBucketUrl
-          - /
-          - codebuild.yaml
-
-      Parameters:
-        ServiceRoleArn: !GetAtt IAMStack.Outputs.CodeBuildRoleArn
-
   S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -106,6 +94,18 @@ Resources:
       Parameters:
         WebsiteBucketName: !Ref WebsiteBucketName
         BuildBucketName: !Ref BuildBucketName
+
+  CodeBuildStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join
+        - ''
+        - - "https://"
+          - !Ref ConfigBucketUrl
+          - /
+          - codebuild.yaml
+      Parameters:
+        ServiceRoleArn: !GetAtt IAMStack.Outputs.CodeBuildRoleArn
 
   CodeDeployStack:
     Type: AWS::CloudFormation::Stack
