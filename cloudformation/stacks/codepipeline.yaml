@@ -61,7 +61,7 @@ Resources:
         Location: !Ref S3Build
 
       Name: TikTakCodePipeline
-      RestartExecutionOnUpdate: true
+      # RestartExecutionOnUpdate: true
       RoleArn: !Ref CodePipelineRoleArn
 
       Stages:
@@ -71,6 +71,7 @@ Resources:
             -
               Name: TikTak-Frontend-Source
               RunOrder: 1
+              InputArtifacts: []
               ActionTypeId:
                 Version: '1'
                 Owner: AWS
@@ -81,12 +82,14 @@ Resources:
                 ConnectionArn: !GetAtt CodestarGithubConnection.ConnectionArn
                 FullRepositoryId: !Ref FrontendRepositoryId
                 BranchName: "main"
-                OutputArtifactFormat: "CODE_ZIP"
+                  # OutputArtifactFormat: "CODE_ZIP"
               OutputArtifacts:
-                - Name: TiktakFrontendSource
+                -
+                  Name: TikTakFrontendSource
             -
               Name: TikTak-Backend-Source
               RunOrder: 1
+              InputArtifacts: []
               ActionTypeId:
                 Version: '1'
                 Owner: AWS
@@ -97,9 +100,10 @@ Resources:
                 ConnectionArn: !GetAtt CodestarGithubConnection.ConnectionArn
                 FullRepositoryId: !Ref BackendRepositoryId
                 BranchName: "main"
-                OutputArtifactFormat: "CODE_ZIP"
+                  # OutputArtifactFormat: "CODE_ZIP"
               OutputArtifacts:
-                - Name: TiktakBackendSource
+                -
+                  Name: TikTakBackendSource
         -
           Name: Build
           Actions:
@@ -107,7 +111,8 @@ Resources:
               Name: TikTak-Frontend-Build
               RunOrder: 1
               InputArtifacts:
-                - Name: TikTakFrontendSource
+                -
+                  Name: TikTakFrontendSource
               ActionTypeId:
                 Category: Build
                 Owner: AWS
@@ -117,35 +122,37 @@ Resources:
                 BatchEnabled: true
                 CombineArtifacts: true
                 ProjectName: !Ref CodeBuildId
-                PrimarySource: TikTak-Frontend-Source
+                PrimarySource: TikTakFrontendSource
                 EnvironmentVariables: !Sub
                   - '[{"name": "REACT_APP_API_ENDPOINT", "value": "${ApiEndpoint}"}]'
                   - { ApiEndpoint: !Ref ApiEndpoint }
               OutputArtifacts:
-                - Name: TikTakFrontendBuild
+                -
+                  Name: TikTakFrontendBuild
         -
           Name: Deploy
           Actions:
-            # -
-            #   Name: TikTak-Frontend-Deploy
-            #   RunOrder: 3
-            #   InputArtifacts:
-            #     - Name: TikTak-Frontend-Build
-            #   ActionTypeId:
-            #     Category: Deploy
-            #     Owner: AWS
-            #     Provider: S3
-            #     Version: '1'
-            #   Configuration:
-            #     S3Bucket: !Ref S3Website
-            #     S3ObjectKey: index.html
-            #   OutputArtifacts:
-            #     - Name: TikTak-Frontend-Website
+            -
+              Name: TikTak-Frontend-Deploy
+              RunOrder: 1
+              InputArtifacts:
+                -
+                  Name: TikTakFrontendBuild
+              ActionTypeId:
+                Version: '1'
+                Owner: AWS
+                Category: Deploy
+                Provider: S3
+              Configuration:
+                BucketName: !Ref S3Website
+                Extract: true
+              OutputArtifacts: []
             -
               Name: TikTak-Backend-Deploy
               RunOrder: 1
               InputArtifacts:
-                - Name: TiktakBackendSource
+                -
+                  Name: TikTakBackendSource
               ActionTypeId:
                 Version: '1'
                 Owner: AWS
@@ -160,3 +167,12 @@ Resources:
         -
           Key: Name
           Value: TikTakCodePipeline
+
+Outputs:
+  CodestarGithubConnection:
+    Description: CodestarGithubConnection
+    Value: !Ref CodestarGithubConnection
+
+  CodePipeline:
+    Description: CodePipeline
+    Value: !Ref CodePipeline
