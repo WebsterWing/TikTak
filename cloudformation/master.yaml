@@ -155,3 +155,15 @@ Resources:
           #   NatGateway2EIP:
           #     Description: NATGateway 2
           #     Value: !GetAtt VPCStack.Outputs.NatGateway2EIP
+Outputs:
+  S3WebsiteDomain:
+    Description: S3Website Domain
+    Value: !GetAtt S3Stack.Outputs.S3WebsiteDomain
+
+  CodePipeline:
+    Description: CodePipeline
+    Value: !GetAtt CodePipelineStack.Outputs.CodePipeline
+
+  CodestarGithubConnection:
+    Description: CodestarGithubConnection
+    Value: !GetAtt CodePipelineStack.Outputs.CodestarGithubConnection

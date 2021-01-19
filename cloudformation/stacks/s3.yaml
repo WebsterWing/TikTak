@@ -27,8 +27,8 @@ Resources:
       BucketName: !Ref BuildBucketName
       AccessControl: Private
       VersioningConfiguration:
-        Status: Suspended
-    DeletionPolicy: Delete
+        Status: Enabled
+          # DeletionPolicy: Delete
 
 Outputs:
   S3WebsiteDomain:
