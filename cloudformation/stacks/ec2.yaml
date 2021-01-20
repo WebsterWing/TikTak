@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS CloudFormation Sample Template EC2InstanceWithSecurityGroupSample:
+Description: 'AWS CloudFormation Sample Template Ec2InstanceWithSecurityGroupSample:
   Create an Amazon EC2 instance running the Amazon Linux AMI. The AMI is chosen based
   on the region in which the stack is run. This example creates an EC2 security group
   for the instance to give you SSH access. **WARNING** This template creates an Amazon
@@ -381,11 +381,19 @@ Mappings:
       HVMG2: ami-0fe84a5b4563d8f27
 
 Resources:
-  EC2Instance:
+  Ec2Instance:
     Type: AWS::EC2::Instance
     DependsOn:
       - TikTakBackendInstanceProfile
     Properties:
+      # AvailabilityZone: !Select
+      #   - 0
+      #   - Fn::GetAZs: !Ref 'AWS::Region'
+      BlockDeviceMappings:
+        -
+          DeviceName: /dev/xvda
+          Ebs:
+            VolumeSize: 8
       SubnetId: !Ref SubnetId
       InstanceType:
         Ref: InstanceType
@@ -395,7 +403,7 @@ Resources:
       KeyName:
         Ref: KeyName
       # Amazon Linux 2
-      ImageId: ami-0d9a6b6c74aafb9d7
+      ImageId: ami-0c30022caa1b45ef6
         #  Fn::FindInMap:
         #  - AWSRegionArch2AMI
         #  - Ref: AWS::Region
@@ -404,6 +412,8 @@ Resources:
         #    - Ref: InstanceType
         #    - Arch
       IamInstanceProfile: TikTakBackendInstanceProfile
+
+        # Volumes: !Ref EC2Volume
 
       UserData:
         !Base64 |
@@ -424,6 +434,15 @@ Resources:
         -
           Key: Name
           Value: TikTakEC2
+
+      # EC2VolumeAttachment:
+      #   DependsOn:
+      #     - EC2Volume
+      #   Type: AWS::EC2::VolumeAttachment
+      #   Properties:
+      #     Device: /dev/sdh
+      #     InstanceId: !Ref Ec2Instance
+      #     VolumeId: !Ref EC2Volume
 
   TikTakBackendInstanceProfile:
     Type: AWS::IAM::InstanceProfile
@@ -464,22 +483,22 @@ Outputs:
   InstanceId:
     Description: InstanceId of the newly created EC2 instance
     Value:
-      Ref: EC2Instance
+      Ref: Ec2Instance
   AZ:
     Description: Availability Zone of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - Ec2Instance
       - AvailabilityZone
   PublicDNS:
     Description: Public DNSName of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - Ec2Instance
       - PublicDnsName
   PublicIP:
     Description: Public IP address of the newly created EC2 instance
     Value:
       Fn::GetAtt:
-      - EC2Instance
+      - Ec2Instance
       - PublicIp

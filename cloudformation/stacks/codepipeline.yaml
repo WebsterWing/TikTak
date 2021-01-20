@@ -119,8 +119,8 @@ Resources:
                 Provider: CodeBuild
                 Version: '1'
               Configuration:
-                BatchEnabled: true
-                CombineArtifacts: true
+                BatchEnabled: false
+                  # CombineArtifacts: true
                 ProjectName: !Ref CodeBuildId
                 PrimarySource: TikTakFrontendSource
                 EnvironmentVariables: !Sub
