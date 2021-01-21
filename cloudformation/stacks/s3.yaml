@@ -18,8 +18,21 @@ Resources:
         #   Status: Suspended
       WebsiteConfiguration:
         IndexDocument: index.html
-        ErrorDocument: 404.html
+          # ErrorDocument: 404.html
     DeletionPolicy: Delete
+
+  S3WebsiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Website
+      PolicyDocument:
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Allow
+            Resource:
+              - !Join [ '', [ 'arn:aws:s3:::', !Ref S3Website, '/*' ] ]
+            Principal: "*"
 
   S3Build:
     Type: AWS::S3::Bucket
