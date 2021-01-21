@@ -48,6 +48,10 @@ Outputs:
     Description: S3 Website Domain name
     Value: !GetAtt S3Website.DomainName
 
+  S3WebsiteURL:
+    Description: S3 Website URL
+    Value: !GetAtt S3Website.WebsiteURL
+
   S3Website:
     Description: S3 Website Bucket
     Value: !Ref S3Website

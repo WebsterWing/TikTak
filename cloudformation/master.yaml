@@ -156,9 +156,13 @@ Resources:
           #     Description: NATGateway 2
           #     Value: !GetAtt VPCStack.Outputs.NatGateway2EIP
 Outputs:
-  S3WebsiteDomain:
-    Description: S3Website Domain
-    Value: !GetAtt S3Stack.Outputs.S3WebsiteDomain
+  S3WebsiteURL:
+    Description: S3Website URL
+    Value: !GetAtt S3Stack.Outputs.S3WebsiteURL
+
+  EC2DNS:
+    Description: EC2 DNS URL
+    Value: !GetAtt EC2Stack.Outputs.PublicDNS
 
   CodePipeline:
     Description: CodePipeline
